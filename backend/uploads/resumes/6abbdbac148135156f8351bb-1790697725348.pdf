@@ -1,0 +1,88 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 1342 >>
+stream
+BT
+/F1 11 Tf
+14 TL
+56 760 Td
+(ANANYA KRISHNAN) Tj
+T*
+(ananya.krishnan@email.com | +91 98765 43210 | github.com/ananyak | linkedin.com/in/ananya-k) Tj
+T*
+() Tj
+T*
+(SUMMARY) Tj
+T*
+(Final year Computer Science student with hands-on experience in applied deep learning) Tj
+T*
+(and computer vision. Built and deployed two production ML services and contributed to) Tj
+T*
+(an open source NLP library. Comfortable owning a feature end to end from data pipeline) Tj
+T*
+(to a monitored API. Looking for a team where I can own the model while others own the) Tj
+T*
+(product surface.) Tj
+T*
+() Tj
+T*
+(EDUCATION) Tj
+T*
+(B.Tech Computer Science and Engineering, 2022 - 2026) Tj
+T*
+(Anna University) Tj
+T*
+() Tj
+T*
+(SKILLS) Tj
+T*
+(Python, TensorFlow, PyTorch, Computer Vision, NLP, scikit-learn, Pandas, NumPy, OpenCV) Tj
+T*
+(Docker, Git, Linux, REST API, FastAPI) Tj
+T*
+() Tj
+T*
+(EXPERIENCE) Tj
+T*
+(Machine Learning Intern, Zeta Robotics \(June 2025 - December 2025\)) Tj
+T*
+(Built an object detection pipeline in PyTorch that improved mAP by 12 percent.) Tj
+T*
+(Deployed the model behind a FastAPI service on AWS with Docker.) Tj
+T*
+() Tj
+T*
+(PROJECTS) Tj
+T*
+(LeafScan: plant disease classifier trained on 54000 images using transfer learning.) Tj
+T*
+(QueryBot: retrieval augmented generation assistant built with LangChain and a vector store.) Tj
+T*
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000338 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1731
+%%EOF
