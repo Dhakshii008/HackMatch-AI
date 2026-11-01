@@ -24,23 +24,5 @@ services:
         value: 7d
       - key: MONGODB_URI
         sync: false          # set to your MongoDB Atlas URI
-      - key: MONGO_URI
-        sync: false          # set to your MongoDB Atlas URI
       - key: CLIENT_URL
-        sync: false          # set to the deployed frontend origin, e.g. https://hackmatch-ai.onrender.com
-      - key: GEMINI_API_KEY
-        sync: false          # optional
-
-  - type: web
-    name: hackmatch-ai
-    runtime: static
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
-    envVars:
-      - key: VITE_API_URL
-        sync: false          # set to https://hackmatch-api.onrender.com
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+        sync: false          # set to https://dhakshii008.github.io
