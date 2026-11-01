@@ -6,3 +6,8 @@ node_modules/
 dist/
 build/
 coverage/
+*.log
+backend/*.log
+backend/uploads/resumes/*.pdf
+.DS_Store
+Thumbs.db

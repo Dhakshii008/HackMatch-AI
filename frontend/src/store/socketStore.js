@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 import { io } from 'socket.io-client';
 
+const getSocketUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl) return '/';
+  return envUrl.trim().replace(/\/api\/?$/, '').replace(/\/+$/, '') || '/';
+};
+
 const useSocketStore = create((set, get) => ({
   socket: null,
   
@@ -8,7 +14,7 @@ const useSocketStore = create((set, get) => ({
     if (get().socket) return;
     // Same-origin by default so the Vite dev proxy handles it; VITE_API_URL
     // points Socket.IO at the deployed backend in production.
-    const newSocket = io(import.meta.env.VITE_API_URL || '/', { query: { userId } });
+    const newSocket = io(getSocketUrl(), { query: { userId } });
     newSocket.on('connect', () => {
       // Join the personal room so notifications and accept/reject events arrive.
       if (userId) newSocket.emit('join_user', userId);

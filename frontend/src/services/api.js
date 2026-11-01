@@ -2,10 +2,17 @@ import axios from 'axios';
 import useAuthStore from '../store/authStore';
 
 // In dev the Vite proxy forwards /api to the backend. In production set
-// VITE_API_URL to the deployed backend origin (e.g. https://api.example.com).
-// Socket.IO is served from the same origin, so the proxy is reused there too.
+// VITE_API_URL to the deployed backend origin (e.g. https://hackmatch-api.onrender.com).
+// Automatically appends /api if omitted so API routes resolve correctly.
+const getBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl) return '/api';
+  const clean = envUrl.trim().replace(/\/+$/, '');
+  return clean.endsWith('/api') ? clean : `${clean}/api`;
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: getBaseUrl(),
   headers: { 'Content-Type': 'application/json' },
 });
 

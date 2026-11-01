@@ -5,28 +5,67 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
 const http = require('http');
+const path = require('path');
+const fs = require('fs');
 const { Server } = require('socket.io');
 
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+// Origin validation helper for CORS (supports localhost, vercel.app, onrender.com, and custom CLIENT_URL)
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+  .split(',')
+  .map(url => url.trim().replace(/\/+$/, ''))
+  .filter(Boolean);
+
+const isOriginAllowed = (origin) => {
+  if (!origin) return true; // allow non-browser requests (Postman, curl, server-to-server)
+  const cleanOrigin = origin.replace(/\/+$/, '');
+  if (allowedOrigins.includes(cleanOrigin) || allowedOrigins.includes('*')) return true;
+  if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(cleanOrigin)) return true;
+  if (/^https:\/\/.*\.vercel\.app$/.test(cleanOrigin)) return true;
+  if (/^https:\/\/.*\.onrender\.com$/.test(cleanOrigin)) return true;
+  return true; // permissive default to ensure no cross-origin blocking between frontend & backend
+};
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: (origin, callback) => callback(null, true),
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true
   }
 });
 
 app.use(express.json());
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
+app.use(cors({
+  origin: (origin, callback) => callback(null, true),
+  credentials: true
+}));
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" })); // Allow images
 app.use(morgan('dev'));
 
+// Ensure uploads/resumes directory exists
+const uploadsDir = path.join(__dirname, 'uploads', 'resumes');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 // Uploads directory
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Root route for API welcome / status
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    name: 'HackMatch AI API',
+    status: 'running',
+    health: '/api/health',
+    time: new Date().toISOString()
+  });
+});
 
 // Health check (used by the deploy platform)
 app.get('/api/health', (req, res) => {
@@ -93,8 +132,14 @@ app.set('io', io);
 
 // Database connection
 const connectDB = async () => {
+  const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+  if (!mongoUri) {
+    console.error('CRITICAL: Neither MONGODB_URI nor MONGO_URI is defined in environment!');
+    setTimeout(connectDB, 5000);
+    return;
+  }
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+    const conn = await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });

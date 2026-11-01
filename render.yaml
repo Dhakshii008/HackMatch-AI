@@ -22,6 +22,8 @@ services:
         generateValue: true
       - key: JWT_EXPIRE
         value: 7d
+      - key: MONGODB_URI
+        sync: false          # set to your MongoDB Atlas URI
       - key: MONGO_URI
         sync: false          # set to your MongoDB Atlas URI
       - key: CLIENT_URL
