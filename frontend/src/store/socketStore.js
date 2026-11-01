@@ -7,11 +7,32 @@ const getSocketUrl = () => {
   return envUrl.trim().replace(/\/api\/?$/, '').replace(/\/+$/, '') || '/';
 };
 
+const isStaticHost = typeof window !== 'undefined' && !import.meta.env.VITE_API_URL && window.location.hostname.includes('github.io');
+
+// Lightweight in-memory socket emulator for static demo hosting
+const createMockSocket = () => {
+  const handlers = {};
+  return {
+    on: (evt, cb) => {
+      handlers[evt] = handlers[evt] || [];
+      handlers[evt].push(cb);
+    },
+    emit: (evt, data) => {
+      if (handlers[evt]) handlers[evt].forEach(cb => cb(data));
+    },
+    disconnect: () => {}
+  };
+};
+
 const useSocketStore = create((set, get) => ({
   socket: null,
   
   connect: (userId) => {
     if (get().socket) return;
+    if (isStaticHost) {
+      set({ socket: createMockSocket() });
+      return;
+    }
     // Same-origin by default so the Vite dev proxy handles it; VITE_API_URL
     // points Socket.IO at the deployed backend in production.
     const newSocket = io(getSocketUrl(), { query: { userId } });
