@@ -12,9 +12,42 @@ const getBaseUrl = () => {
   return clean.endsWith('/api') ? clean : `${clean}/api`;
 };
 
+// Check if running on static hosting without an active external backend
+const isStaticHost =
+  typeof window !== 'undefined' &&
+  (!import.meta.env.VITE_API_URL ||
+    window.location.hostname.includes('github.io') ||
+    window.location.protocol === 'file:');
+
+// Direct adapter for in-browser demo engine on static hosts
+const demoAxiosAdapter = async (config) => {
+  try {
+    const res = await handleDemoRequest(config);
+    return {
+      data: res.data,
+      status: 200,
+      statusText: 'OK',
+      headers: { 'content-type': 'application/json' },
+      config,
+      request: {}
+    };
+  } catch (err) {
+    if (err.response) return Promise.reject(err);
+    const error = new Error(err.message || 'Demo Request Failed');
+    error.config = config;
+    error.response = {
+      data: { success: false, message: err.message || 'Request failed' },
+      status: 400,
+      statusText: 'Bad Request'
+    };
+    return Promise.reject(error);
+  }
+};
+
 const api = axios.create({
   baseURL: getBaseUrl(),
   headers: { 'Content-Type': 'application/json' },
+  adapter: isStaticHost ? demoAxiosAdapter : undefined
 });
 
 api.interceptors.request.use((config) => {
@@ -28,12 +61,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // If backend is not available (404 on static host, 502/503, or Network Error),
-    // automatically fall back to the In-Browser Demo Engine so demo accounts,
-    // registration, problem browsing, team workspace, and rubric scoring work seamlessly.
+    // If backend is not available (404, 405 Method Not Allowed on static hosts, 502/503, or Network Error),
+    // automatically fall back to the In-Browser Demo Engine.
     const isOfflineOrNotFound =
       !error.response ||
       error.response.status === 404 ||
+      error.response.status === 405 ||
       error.response.status === 502 ||
       error.response.status === 503 ||
       error.code === 'ERR_NETWORK';
@@ -41,7 +74,14 @@ api.interceptors.response.use(
     if (isOfflineOrNotFound && error.config) {
       try {
         const demoResponse = await handleDemoRequest(error.config);
-        return demoResponse;
+        return {
+          data: demoResponse.data,
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: error.config,
+          request: {}
+        };
       } catch (demoErr) {
         return Promise.reject(demoErr);
       }

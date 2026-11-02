@@ -7,9 +7,25 @@ import { demoStore, DEMO_PASSWORD } from './demoService';
  */
 export async function handleDemoRequest(config) {
   const method = (config.method || 'get').toLowerCase();
-  const rawUrl = (config.url || '').replace(/^https?:\/\/[^/]+/, '');
-  const cleanUrl = rawUrl.replace(/^\/api/, '');
-  const data = typeof config.data === 'string' ? JSON.parse(config.data || '{}') : (config.data || {});
+  
+  // Normalize URL path to strip domain, base paths (/HackMatch-AI), and /api prefix
+  const rawUrl = (config.url || '')
+    .replace(/^https?:\/\/[^/]+/, '')
+    .replace(/^\/?HackMatch-AI/i, '')
+    .replace(/^\/?api/i, '');
+  
+  const cleanUrl = '/' + rawUrl.replace(/^\/+/, '');
+
+  let data = config.data;
+  if (typeof data === 'string') {
+    try {
+      data = JSON.parse(data);
+    } catch {
+      data = {};
+    }
+  } else if (!data) {
+    data = {};
+  }
 
   // Simulate network latency (50-150ms) for realistic UX
   await new Promise(r => setTimeout(r, 60));
@@ -33,26 +49,24 @@ export async function handleDemoRequest(config) {
   }
 
   // 2. POST /auth/login
-  if (cleanUrl === '/auth/login' && method === 'post') {
+  if (cleanUrl.startsWith('/auth/login') && method === 'post') {
     const email = (data.email || '').trim().toLowerCase();
     const pwd = (data.password || '').trim();
     const users = demoStore.get('users');
-    const user = users.find(u => u.email.toLowerCase() === email);
+    let user = users.find(u => u.email.toLowerCase() === email);
 
-    if (user && (pwd === DEMO_PASSWORD || pwd === 'Judge@123' || pwd === 'Admin@123' || user.password === pwd || !user.password)) {
-      const token = 'demo_jwt_' + btoa(JSON.stringify({ id: user._id, email: user.email, role: user.role }));
-      demoStore.set('currentUser', user);
-      return { data: { success: true, token, data: user } };
+    // If not found, check partial or default to first demo user
+    if (!user && email.includes('judge')) {
+      user = users.find(u => u.role === 'judge');
+    } else if (!user && email.includes('admin')) {
+      user = users.find(u => u.role === 'admin');
+    } else if (!user) {
+      user = users[0];
     }
-    // Allow any demo sign-in for testing
-    if (user) {
-      const token = 'demo_jwt_' + btoa(JSON.stringify({ id: user._id, email: user.email, role: user.role }));
-      demoStore.set('currentUser', user);
-      return { data: { success: true, token, data: user } };
-    }
-    const err = new Error('Invalid credentials');
-    err.response = { status: 401, data: { success: false, message: 'Invalid credentials. Use Demo@123.' } };
-    throw err;
+
+    const safeToken = 'demo_token_' + Date.now() + '_' + Math.random().toString(36).substring(2);
+    demoStore.set('currentUser', user);
+    return { data: { success: true, token: safeToken, data: user } };
   }
 
   // 3. POST /auth/register
@@ -328,3 +342,4 @@ export async function handleDemoRequest(config) {
   // Default fallback
   return { data: { success: true, data: [] } };
 }
+
