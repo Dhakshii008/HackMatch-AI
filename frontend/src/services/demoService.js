@@ -1,16 +1,57 @@
 /**
  * HackMatch AI - In-Browser Demo Engine
- * Provides persistent, realistic sample data and offline API emulation
- * for all 15 demo accounts, problem statements, teams, AI matchmaking,
- * chat, tasks, project submissions, judge evaluations, and certificates.
+ * Real-time state store with the exact 15 demo accounts from backend seed data,
+ * with Dhakshitha and Ananya featured at the top.
  */
 
 export const DEMO_PASSWORD = 'Demo@123';
 
 export const INITIAL_DEMO_USERS = [
   {
+    _id: 'usr_dhakshitha',
+    name: 'Dhakshitha',
+    email: 'dhakshitha@hackmatch.ai',
+    department: 'Computer Science & Engineering',
+    year: '3rd Year',
+    college: 'Sri Shakthi Institute of Engineering & Technology',
+    role: 'participant',
+    skills: ['Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'Docker', 'GraphQL'],
+    techSkills: ['Node.js', 'Express', 'MongoDB', 'Docker'],
+    softSkills: ['Problem Solving', 'Teamwork', 'Communication'],
+    languages: ['JavaScript', 'SQL', 'English'],
+    experience: ['Backend Intern at CloudTech (5 months)', 'Built scalable authentication & chat systems'],
+    githubUrl: 'https://github.com/dhakshitha',
+    linkedinUrl: 'https://linkedin.com/in/dhakshitha',
+    bio: 'Full-stack & backend engineer building robust APIs, scalable microservices, and database architectures.',
+    profileStrength: 96,
+    aiSkillScore: 95,
+    teamId: 'team_nexus',
+    isDemoAccount: true
+  },
+  {
+    _id: 'usr_ananya',
+    name: 'Ananya',
+    email: 'ananya@hackmatch.ai',
+    department: 'Information Technology',
+    year: '3rd Year',
+    college: 'VIT Vellore',
+    role: 'participant',
+    skills: ['React', 'TypeScript', 'Next.js', 'Tailwind CSS', 'UI/UX', 'Figma'],
+    techSkills: ['React', 'TypeScript', 'Tailwind CSS', 'Next.js'],
+    softSkills: ['Leadership', 'Creative Problem Solving'],
+    languages: ['JavaScript', 'TypeScript', 'English'],
+    experience: ['Frontend Engineer Intern at FinTech Startup (4 months)'],
+    githubUrl: 'https://github.com/ananya',
+    linkedinUrl: 'https://linkedin.com/in/ananya',
+    bio: 'Frontend specialist crafting slick, responsive UIs with modern React and Tailwind CSS.',
+    profileStrength: 94,
+    aiSkillScore: 92,
+    teamId: 'team_nexus',
+    isDemoAccount: true
+  },
+  {
     _id: 'usr_arjun',
-    name: 'Arjun Mehta',
+    name: 'Arjun',
     email: 'arjun@hackmatch.ai',
     department: 'Computer Science & Engineering',
     year: '3rd Year',
@@ -31,7 +72,7 @@ export const INITIAL_DEMO_USERS = [
   },
   {
     _id: 'usr_priya',
-    name: 'Priya Sharma',
+    name: 'Priya',
     email: 'priya@hackmatch.ai',
     department: 'Computer Science & Engineering',
     year: '3rd Year',
@@ -52,7 +93,7 @@ export const INITIAL_DEMO_USERS = [
   },
   {
     _id: 'usr_karthik',
-    name: 'Karthik Nair',
+    name: 'Karthik',
     email: 'karthik@hackmatch.ai',
     department: 'Computer Science & Engineering',
     year: '3rd Year',
@@ -73,7 +114,7 @@ export const INITIAL_DEMO_USERS = [
   },
   {
     _id: 'usr_meera',
-    name: 'Meera Joshi',
+    name: 'Meera',
     email: 'meera@hackmatch.ai',
     department: 'Information Technology',
     year: '4th Year',
@@ -94,7 +135,7 @@ export const INITIAL_DEMO_USERS = [
   },
   {
     _id: 'usr_rahul',
-    name: 'Rahul Verma',
+    name: 'Rahul',
     email: 'rahul@hackmatch.ai',
     department: 'Information Science',
     year: '3rd Year',
@@ -115,7 +156,7 @@ export const INITIAL_DEMO_USERS = [
   },
   {
     _id: 'usr_sneha',
-    name: 'Sneha Patel',
+    name: 'Sneha',
     email: 'sneha@hackmatch.ai',
     department: 'Computer Science & Engineering',
     year: '4th Year',
@@ -135,50 +176,8 @@ export const INITIAL_DEMO_USERS = [
     isDemoAccount: true
   },
   {
-    _id: 'usr_dhakshitha',
-    name: 'Dhakshitha Mylsamy',
-    email: 'dhakshitha@hackmatch.ai',
-    department: 'Computer Science & Engineering',
-    year: '3rd Year',
-    college: 'Sri Shakthi Institute of Engineering & Technology',
-    role: 'participant',
-    skills: ['Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'Docker', 'GraphQL'],
-    techSkills: ['Node.js', 'Express', 'MongoDB', 'Docker'],
-    softSkills: ['Problem Solving', 'Teamwork', 'Communication'],
-    languages: ['JavaScript', 'SQL', 'English'],
-    experience: ['Backend Intern at CloudTech (5 months)', 'Built scalable authentication & chat systems'],
-    githubUrl: 'https://github.com/dhakshitha',
-    linkedinUrl: 'https://linkedin.com/in/dhakshitha',
-    bio: 'Full-stack & backend engineer building robust APIs, scalable microservices, and database architectures.',
-    profileStrength: 96,
-    aiSkillScore: 95,
-    teamId: null,
-    isDemoAccount: true
-  },
-  {
-    _id: 'usr_ananya',
-    name: 'Ananya Iyer',
-    email: 'ananya@hackmatch.ai',
-    department: 'Information Technology',
-    year: '3rd Year',
-    college: 'VIT Vellore',
-    role: 'participant',
-    skills: ['React', 'TypeScript', 'Next.js', 'Tailwind CSS', 'UI/UX', 'Figma'],
-    techSkills: ['React', 'TypeScript', 'Tailwind CSS', 'Next.js'],
-    softSkills: ['Leadership', 'Creative Problem Solving'],
-    languages: ['JavaScript', 'TypeScript', 'English'],
-    experience: ['Frontend Engineer Intern at FinTech Startup (4 months)'],
-    githubUrl: 'https://github.com/ananya',
-    linkedinUrl: 'https://linkedin.com/in/ananya',
-    bio: 'Frontend specialist crafting slick, responsive UIs with modern React and Tailwind CSS.',
-    profileStrength: 92,
-    aiSkillScore: 90,
-    teamId: null,
-    isDemoAccount: true
-  },
-  {
     _id: 'usr_kiran',
-    name: 'Kiran Reddy',
+    name: 'Kiran',
     email: 'kiran@hackmatch.ai',
     department: 'Data Science',
     year: '4th Year',
@@ -199,7 +198,7 @@ export const INITIAL_DEMO_USERS = [
   },
   {
     _id: 'usr_kishor',
-    name: 'Kishor Kumar',
+    name: 'Kishor',
     email: 'kishor@hackmatch.ai',
     department: 'Cybersecurity',
     year: '3rd Year',
@@ -220,7 +219,7 @@ export const INITIAL_DEMO_USERS = [
   },
   {
     _id: 'usr_harnish',
-    name: 'Harnish Patel',
+    name: 'Harnish',
     email: 'harnish@hackmatch.ai',
     department: 'Electronics & Communication',
     year: '3rd Year',
@@ -241,7 +240,7 @@ export const INITIAL_DEMO_USERS = [
   },
   {
     _id: 'usr_divya',
-    name: 'Divya Reddy',
+    name: 'Divya',
     email: 'divya@hackmatch.ai',
     department: 'Computer Science & Design',
     year: '2nd Year',
@@ -262,7 +261,7 @@ export const INITIAL_DEMO_USERS = [
   },
   {
     _id: 'usr_vikram',
-    name: 'Vikram Singh',
+    name: 'Vikram',
     email: 'vikram@hackmatch.ai',
     department: 'Computer Science & Engineering',
     year: '4th Year',
@@ -283,7 +282,7 @@ export const INITIAL_DEMO_USERS = [
   },
   {
     _id: 'usr_pooja',
-    name: 'Pooja Hegde',
+    name: 'Pooja',
     email: 'pooja@hackmatch.ai',
     department: 'Information Technology',
     year: '3rd Year',
@@ -304,7 +303,7 @@ export const INITIAL_DEMO_USERS = [
   },
   {
     _id: 'usr_siddharth',
-    name: 'Siddharth Roy',
+    name: 'Siddharth',
     email: 'siddharth@hackmatch.ai',
     department: 'Computer Science & Engineering',
     year: '3rd Year',
@@ -323,10 +322,9 @@ export const INITIAL_DEMO_USERS = [
     teamId: null,
     isDemoAccount: true
   },
-  // Official Evaluation & Administration Roles
   {
     _id: 'usr_judge_rajesh',
-    name: 'Dr. Rajesh Kumar',
+    name: 'Judge Official',
     email: 'judge@hackmatch.ai',
     role: 'judge',
     department: 'Computer Science Faculty',
@@ -338,7 +336,7 @@ export const INITIAL_DEMO_USERS = [
   },
   {
     _id: 'usr_admin',
-    name: 'Hackathon Admin',
+    name: 'Administrator',
     email: 'admin@hackmatch.ai',
     role: 'admin',
     department: 'Hackathon Organizing Committee',
@@ -366,13 +364,14 @@ export const INITIAL_TEAMS = [
     _id: 'team_nexus',
     name: 'Nexus AI',
     problem: INITIAL_PROBLEMS[0],
-    leader: 'usr_arjun',
+    leader: 'usr_dhakshitha',
     members: [
-      { user: INITIAL_DEMO_USERS[0], role: 'Full Stack Lead' },
-      { user: INITIAL_DEMO_USERS[1], role: 'AI/ML Lead' }
+      { user: INITIAL_DEMO_USERS[0], role: 'Backend Lead' },
+      { user: INITIAL_DEMO_USERS[1], role: 'Frontend Lead' },
+      { user: INITIAL_DEMO_USERS[2], role: 'Full Stack Member' }
     ],
-    aiSummary: 'Arjun Mehta leads a complementary team covering 10 distinct skills with balanced full-stack and AI expertise.',
-    compatibilityScore: 94
+    aiSummary: 'Dhakshitha and Ananya lead a high-synergy full-stack team with balanced frontend, microservices, and AI capabilities.',
+    compatibilityScore: 96
   },
   {
     _id: 'team_codecraft',
@@ -380,8 +379,8 @@ export const INITIAL_TEAMS = [
     problem: INITIAL_PROBLEMS[2],
     leader: 'usr_rahul',
     members: [
-      { user: INITIAL_DEMO_USERS[4], role: 'Backend Lead' },
-      { user: INITIAL_DEMO_USERS[5], role: 'DevOps Lead' }
+      { user: INITIAL_DEMO_USERS[6], role: 'Backend Lead' },
+      { user: INITIAL_DEMO_USERS[7], role: 'DevOps Lead' }
     ],
     aiSummary: 'Robust backend and cloud infrastructure pairing with high execution resilience.',
     compatibilityScore: 91
@@ -401,8 +400,8 @@ export const INITIAL_TEAMS = [
 ];
 
 export const INITIAL_TASKS = [
-  { _id: 'tsk_1', team: 'team_nexus', title: 'Set up Vite + Tailwind UI Layout', status: 'completed', priority: 'high', assignedTo: INITIAL_DEMO_USERS[0] },
-  { _id: 'tsk_2', team: 'team_nexus', title: 'Train PyTorch image classification model', status: 'completed', priority: 'high', assignedTo: INITIAL_DEMO_USERS[1] },
+  { _id: 'tsk_1', team: 'team_nexus', title: 'Set up Vite + Tailwind UI Layout', status: 'completed', priority: 'high', assignedTo: INITIAL_DEMO_USERS[1] },
+  { _id: 'tsk_2', team: 'team_nexus', title: 'Build Express + Socket.IO Backend API', status: 'completed', priority: 'high', assignedTo: INITIAL_DEMO_USERS[0] },
   { _id: 'tsk_3', team: 'team_nexus', title: 'Connect Real-time Socket.io Chat', status: 'in-progress', priority: 'medium', assignedTo: INITIAL_DEMO_USERS[0] },
   { _id: 'tsk_4', team: 'team_nexus', title: 'Deploy prototype to cloud demo container', status: 'todo', priority: 'high', assignedTo: INITIAL_DEMO_USERS[1] }
 ];
@@ -411,14 +410,14 @@ export const INITIAL_PROJECTS = [
   {
     _id: 'proj_nexus',
     team: 'team_nexus',
-    title: 'MedAI Triage & Clinical Assistant',
-    description: 'Autonomous medical triage assistant combining deep-learning Grad-CAM medical imaging classifier with RAG-based diagnostic triage.',
+    title: 'HackMatch AI - Platform Solution',
+    description: 'Autonomous hackathon matchmaking and real-time team collaboration platform with AI resume parsing and smart complementarity scoring.',
     problem: INITIAL_PROBLEMS[0],
-    techStack: ['React', 'Python', 'FastAPI', 'PyTorch', 'Tailwind CSS', 'MongoDB'],
-    githubUrl: 'https://github.com/hackmatch/medai-demo',
+    techStack: ['React', 'Node.js', 'Express', 'Tailwind CSS', 'MongoDB', 'Socket.io'],
+    githubUrl: 'https://github.com/Dhakshii008/HackMatch-AI',
     demoUrl: 'https://dhakshii008.github.io/HackMatch-AI/',
     videoUrl: 'https://youtube.com/watch?v=demo',
-    innovation: 'Multi-agent diagnostic verification combining vision Transformers and clinical knowledge graphs.',
+    innovation: 'Multi-agent matchmaking with skill-overlap analysis and live WebSocket task collaboration.',
     isSubmitted: true,
     submittedAt: new Date(Date.now() - 3600000).toISOString()
   }
@@ -432,7 +431,7 @@ export const INITIAL_SUBMISSIONS = [
     project: INITIAL_PROJECTS[0],
     submittedBy: INITIAL_DEMO_USERS[0],
     status: 'submitted',
-    autoEvalScore: 88,
+    autoEvalScore: 92,
     createdAt: new Date(Date.now() - 3600000).toISOString()
   }
 ];
@@ -444,49 +443,48 @@ export const INITIAL_EVALUATIONS = [
     team: 'team_nexus',
     judge: INITIAL_DEMO_USERS[15],
     scores: {
-      innovation: 9,
-      technicalExecution: 9,
+      innovation: 10,
+      technicalExecution: 10,
       presentation: 9,
       impact: 9
     },
-    totalScore: 90,
-    feedback: 'Outstanding technical depth and clear complementary collaboration. Clean UI and solid AI integration.',
+    totalScore: 95,
+    feedback: 'Exceptional architectural execution, seamless teamwork, and high-impact AI matchmaking platform.',
     status: 'evaluated'
   }
 ];
 
 export const INITIAL_CERTIFICATES = [
   {
-    _id: 'cert_arjun_1',
-    certificateId: 'HM-CERT-2026-ARJ101',
+    _id: 'cert_dhakshitha_1',
+    certificateId: 'HM-CERT-2026-DHAK101',
     user: INITIAL_DEMO_USERS[0],
-    userName: 'Arjun Mehta',
+    userName: 'Dhakshitha',
     team: INITIAL_TEAMS[0],
     teamName: 'Nexus AI',
-    projectTitle: 'MedAI Triage & Clinical Assistant',
+    projectTitle: 'HackMatch AI - Platform Solution',
     hackathonName: 'HackMatch AI 2026',
     type: 'winner',
     awardTitle: 'Grand Winner - 1st Prize',
     issueDate: new Date().toISOString(),
-    verificationUrl: 'https://dhakshii008.github.io/HackMatch-AI/verify/HM-CERT-2026-ARJ101'
+    verificationUrl: 'https://dhakshii008.github.io/HackMatch-AI/verify/HM-CERT-2026-DHAK101'
   },
   {
-    _id: 'cert_priya_1',
-    certificateId: 'HM-CERT-2026-PRI202',
+    _id: 'cert_ananya_1',
+    certificateId: 'HM-CERT-2026-ANA202',
     user: INITIAL_DEMO_USERS[1],
-    userName: 'Priya Sharma',
+    userName: 'Ananya',
     team: INITIAL_TEAMS[0],
     teamName: 'Nexus AI',
-    projectTitle: 'MedAI Triage & Clinical Assistant',
+    projectTitle: 'HackMatch AI - Platform Solution',
     hackathonName: 'HackMatch AI 2026',
     type: 'winner',
     awardTitle: 'Grand Winner - 1st Prize',
     issueDate: new Date().toISOString(),
-    verificationUrl: 'https://dhakshii008.github.io/HackMatch-AI/verify/HM-CERT-2026-PRI202'
+    verificationUrl: 'https://dhakshii008.github.io/HackMatch-AI/verify/HM-CERT-2026-ANA202'
   }
 ];
 
-// In-Memory / LocalStorage database manager
 class DemoStore {
   constructor() {
     this.init();
@@ -505,12 +503,16 @@ class DemoStore {
     try {
       localStorage.setItem(`hackmatch_${key}`, JSON.stringify(value));
     } catch (e) {
-      console.warn('Storage quota or error:', e);
+      console.warn('Storage error:', e);
     }
   }
 
   init() {
-    if (!this.get('users', null)) this.set('users', INITIAL_DEMO_USERS);
+    const savedUsers = this.get('users', null);
+    // Refresh users list if missing or if Dhakshitha is not at the top
+    if (!savedUsers || savedUsers[0]?.email !== 'dhakshitha@hackmatch.ai') {
+      this.set('users', INITIAL_DEMO_USERS);
+    }
     if (!this.get('problems', null)) this.set('problems', INITIAL_PROBLEMS);
     if (!this.get('teams', null)) this.set('teams', INITIAL_TEAMS);
     if (!this.get('tasks', null)) this.set('tasks', INITIAL_TASKS);
@@ -521,25 +523,23 @@ class DemoStore {
     if (!this.get('requests', null)) this.set('requests', { sent: [], received: [] });
     if (!this.get('messages', null)) {
       this.set('messages', [
-        { _id: 'msg_1', team: 'team_nexus', sender: INITIAL_DEMO_USERS[0], text: 'Hey Priya! I finished the main navigation and theme layout.', createdAt: new Date(Date.now() - 7200000).toISOString() },
-        { _id: 'msg_2', team: 'team_nexus', sender: INITIAL_DEMO_USERS[1], text: 'Awesome Arjun! The FastAPI model serving endpoint is deployed and returning 96% accuracy.', createdAt: new Date(Date.now() - 3600000).toISOString() }
+        { _id: 'msg_1', team: 'team_nexus', sender: INITIAL_DEMO_USERS[0], text: 'Hey team! Full-stack architecture and demo engine are live and ready.', createdAt: new Date(Date.now() - 7200000).toISOString() },
+        { _id: 'msg_2', team: 'team_nexus', sender: INITIAL_DEMO_USERS[1], text: 'Awesome Dhakshitha! UI components and matchmaking pages look fantastic.', createdAt: new Date(Date.now() - 3600000).toISOString() }
       ]);
     }
     if (!this.get('notifications', null)) {
       this.set('notifications', [
-        { _id: 'notif_1', userId: 'usr_arjun', type: 'match', title: 'High AI Compatibility Match!', message: 'Priya Sharma shares matching problem interests with 94% complementary skills.', createdAt: new Date().toISOString() },
-        { _id: 'notif_2', userId: 'usr_arjun', type: 'team', title: 'Team Nexus AI Formed', message: 'You and Priya Sharma are now collaborating on PS001 Smart Healthcare AI Assistant.', createdAt: new Date().toISOString() }
+        { _id: 'notif_1', userId: 'usr_dhakshitha', type: 'match', title: 'High AI Compatibility Match!', message: 'Ananya shares matching problem interests with 96% complementary skills.', createdAt: new Date().toISOString() },
+        { _id: 'notif_2', userId: 'usr_dhakshitha', type: 'team', title: 'Team Nexus AI Formed', message: 'You and Ananya are now collaborating on PS001 Smart Healthcare AI Assistant.', createdAt: new Date().toISOString() }
       ]);
     }
   }
 
-  // Find user by email or ID
   getUser(identifier) {
     const users = this.get('users', INITIAL_DEMO_USERS);
     return users.find(u => u._id === identifier || u.email.toLowerCase() === String(identifier).toLowerCase());
   }
 
-  // AI Matching Algorithm emulation (exact match to backend logic)
   getMatches(currentUserId) {
     const users = this.get('users', INITIAL_DEMO_USERS);
     const currentUser = users.find(u => u._id === currentUserId) || users[0];
@@ -566,7 +566,6 @@ class DemoStore {
         : [`Shares ${sharedSkills.slice(0, 2).join(', ')} knowledge for stronger collaboration.`];
       if (uniqueSkills.length > 2) reasons.push(`Covers ${uniqueSkills.length} domain skills outside your primary stack.`);
 
-      // Check relationship status
       const requests = this.get('requests', { sent: [], received: [] });
       let status = 'AVAILABLE';
       if (currentUser.teamId && u.teamId && currentUser.teamId === u.teamId) {
