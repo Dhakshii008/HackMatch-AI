@@ -485,6 +485,27 @@ export const INITIAL_CERTIFICATES = [
   }
 ];
 
+export const INITIAL_REQUESTS = [
+  {
+    _id: 'req_arjun_to_dhakshitha',
+    sender: INITIAL_DEMO_USERS[2], // Arjun (usr_arjun)
+    receiver: INITIAL_DEMO_USERS[0], // Dhakshitha (usr_dhakshitha)
+    problem: INITIAL_PROBLEMS[0],
+    message: "Hi Dhakshitha! Our AI profiles have a 95% compatibility match. Let's collaborate on the Smart Healthcare AI Assistant!",
+    status: 'pending',
+    createdAt: new Date(Date.now() - 1800000).toISOString()
+  },
+  {
+    _id: 'req_priya_to_ananya',
+    sender: INITIAL_DEMO_USERS[3], // Priya (usr_priya)
+    receiver: INITIAL_DEMO_USERS[1], // Ananya (usr_ananya)
+    problem: INITIAL_PROBLEMS[0],
+    message: "Hey Ananya! Loved your UI designs. Let's team up to build the AI diagnostic assistant!",
+    status: 'pending',
+    createdAt: new Date(Date.now() - 3600000).toISOString()
+  }
+];
+
 class DemoStore {
   constructor() {
     this.init();
@@ -520,11 +541,14 @@ class DemoStore {
     if (!this.get('submissions', null)) this.set('submissions', INITIAL_SUBMISSIONS);
     if (!this.get('evaluations', null)) this.set('evaluations', INITIAL_EVALUATIONS);
     if (!this.get('certificates', null)) this.set('certificates', INITIAL_CERTIFICATES);
-    if (!this.get('requests', null)) this.set('requests', { sent: [], received: [] });
+    const savedRequests = this.get('requests', null);
+    if (!savedRequests || (Array.isArray(savedRequests) && savedRequests.length === 0) || (savedRequests.sent && savedRequests.received && savedRequests.received.length === 0)) {
+      this.set('requests', INITIAL_REQUESTS);
+    }
     if (!this.get('messages', null)) {
       this.set('messages', [
-        { _id: 'msg_1', team: 'team_nexus', sender: INITIAL_DEMO_USERS[0], text: 'Hey team! Full-stack architecture and demo engine are live and ready.', createdAt: new Date(Date.now() - 7200000).toISOString() },
-        { _id: 'msg_2', team: 'team_nexus', sender: INITIAL_DEMO_USERS[1], text: 'Awesome Dhakshitha! UI components and matchmaking pages look fantastic.', createdAt: new Date(Date.now() - 3600000).toISOString() }
+        { _id: 'msg_1', team: 'team_nexus', sender: INITIAL_DEMO_USERS[0], content: 'Hey team! Full-stack architecture and demo engine are live and ready.', text: 'Hey team! Full-stack architecture and demo engine are live and ready.', createdAt: new Date(Date.now() - 7200000).toISOString() },
+        { _id: 'msg_2', team: 'team_nexus', sender: INITIAL_DEMO_USERS[1], content: 'Awesome Dhakshitha! UI components and matchmaking pages look fantastic.', text: 'Awesome Dhakshitha! UI components and matchmaking pages look fantastic.', createdAt: new Date(Date.now() - 3600000).toISOString() }
       ]);
     }
     if (!this.get('notifications', null)) {

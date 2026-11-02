@@ -122,44 +122,185 @@ export async function handleDemoRequest(config) {
 
   // 8. GET /collaboration/requests
   if (cleanUrl.startsWith('/collaboration/requests')) {
-    const requests = demoStore.get('requests', { sent: [], received: [] });
-    return { data: { success: true, data: requests } };
+    const currentUser = demoStore.get('currentUser') || demoStore.get('users')[0];
+    const rawReqs = demoStore.get('requests', []);
+    const reqList = Array.isArray(rawReqs) ? rawReqs : [...(rawReqs.sent || []), ...(rawReqs.received || [])];
+    
+    const sent = reqList.filter(r => String(r.sender?._id || r.sender) === String(currentUser._id));
+    const received = reqList.filter(r => String(r.receiver?._id || r.receiver) === String(currentUser._id));
+
+    if (cleanUrl.includes('/incoming')) {
+      return { data: { success: true, data: received } };
+    }
+    if (cleanUrl.includes('/sent')) {
+      return { data: { success: true, data: sent } };
+    }
+    return { data: { success: true, data: { sent, received } } };
   }
 
   // 9. POST /collaboration/request
   if (cleanUrl === '/collaboration/request' && method === 'post') {
     const currentUser = demoStore.get('currentUser') || demoStore.get('users')[0];
     const receiver = demoStore.getUser(data.receiverId);
-    const requests = demoStore.get('requests', { sent: [], received: [] });
+    if (!receiver) {
+      return { data: { success: false, message: 'Recipient not found' } };
+    }
+    const rawReqs = demoStore.get('requests', []);
+    const reqList = Array.isArray(rawReqs) ? rawReqs : [...(rawReqs.sent || []), ...(rawReqs.received || [])];
+    
     const newReq = {
       _id: 'req_' + Date.now(),
       sender: currentUser,
       receiver,
-      message: data.message || 'Hey, let us team up!',
+      problem: data.problemId ? (demoStore.get('problems', []).find(p => p._id === data.problemId) || null) : null,
+      message: data.message || `Hi ${receiver.name.split(' ')[0]}, let's collaborate on this hackathon!`,
       status: 'pending',
       createdAt: new Date().toISOString()
     };
-    requests.sent.push(newReq);
-    demoStore.set('requests', requests);
-    return { data: { success: true, message: 'Request sent successfully', data: newReq } };
+    reqList.unshift(newReq);
+    demoStore.set('requests', reqList);
+
+    const notifs = demoStore.get('notifications', []);
+    notifs.unshift({
+      _id: 'notif_' + Date.now(),
+      userId: receiver._id,
+      type: 'collaboration_request',
+      title: 'New Collaboration Request',
+      message: `${currentUser.name} wants to collaborate with you!`,
+      createdAt: new Date().toISOString()
+    });
+    demoStore.set('notifications', notifs);
+
+    return { data: { success: true, message: 'Collaboration request sent successfully!', data: newReq } };
   }
 
   // 10. PUT /collaboration/requests/:id/accept
   if (cleanUrl.includes('/accept') && method === 'put') {
     const currentUser = demoStore.get('currentUser') || demoStore.get('users')[0];
-    const teams = demoStore.get('teams');
-    const users = demoStore.get('users');
-    const myTeam = teams[0];
-    currentUser.teamId = myTeam._id;
-    demoStore.set('currentUser', currentUser);
-    return { data: { success: true, message: 'Request accepted. Team updated!', data: { team: myTeam } } };
+    const match = cleanUrl.match(/\/requests\/([^/]+)\/accept/);
+    const reqId = match ? match[1] : null;
+
+    const rawReqs = demoStore.get('requests', []);
+    const reqList = Array.isArray(rawReqs) ? rawReqs : [...(rawReqs.sent || []), ...(rawReqs.received || [])];
+    const targetReq = (reqId ? reqList.find(r => r._id === reqId) : null) || 
+      reqList.find(r => String(r.receiver?._id || r.receiver) === String(currentUser._id) && r.status === 'pending');
+
+    let sender = targetReq?.sender ? demoStore.getUser(targetReq.sender._id || targetReq.sender) : null;
+    if (!sender || String(sender._id) === String(currentUser._id)) {
+      sender = targetReq?.receiver ? demoStore.getUser(targetReq.receiver._id || targetReq.receiver) : demoStore.get('users')[1];
+    }
+
+    if (targetReq) {
+      targetReq.status = 'accepted';
+      demoStore.set('requests', reqList);
+    }
+
+    const teams = demoStore.get('teams', []);
+    let team = teams.find(t => 
+      (currentUser.teamId && t._id === currentUser.teamId) ||
+      (sender?.teamId && t._id === sender.teamId) ||
+      t.members?.some(m => String(m.user?._id || m.user) === String(currentUser._id))
+    );
+
+    const problem = targetReq?.problem || demoStore.get('problems')[0];
+
+    if (!team) {
+      const teamId = 'team_' + Date.now();
+      team = {
+        _id: teamId,
+        name: `Team ${currentUser.name.split(' ')[0]} & ${sender?.name?.split(' ')[0] || 'Innovator'}`,
+        teamCode: 'HM-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+        problem,
+        leader: sender?._id || currentUser._id,
+        members: [
+          { user: sender, role: 'leader' },
+          { user: currentUser, role: 'member' }
+        ],
+        compatibilityScore: 95,
+        aiSummary: `${currentUser.name} and ${sender?.name} form a complementary team combining their skills.`
+      };
+      teams.unshift(team);
+    } else {
+      const hasMe = team.members.some(m => String(m.user?._id || m.user) === String(currentUser._id));
+      if (!hasMe) team.members.push({ user: currentUser, role: 'member' });
+      if (sender) {
+        const hasSender = team.members.some(m => String(m.user?._id || m.user) === String(sender._id));
+        if (!hasSender) team.members.push({ user: sender, role: 'member' });
+      }
+    }
+
+    currentUser.teamId = team._id;
+    if (sender) sender.teamId = team._id;
+
+    const allUsers = demoStore.get('users', []);
+    const updatedUsers = allUsers.map(u => {
+      if (u._id === currentUser._id) return { ...u, teamId: team._id };
+      if (sender && u._id === sender._id) return { ...u, teamId: team._id };
+      return u;
+    });
+
+    demoStore.set('users', updatedUsers);
+    demoStore.set('currentUser', { ...currentUser, teamId: team._id });
+    demoStore.set('teams', teams);
+
+    // Seed welcome message in team conversation if empty
+    const messages = demoStore.get('messages', []);
+    const hasMsgs = messages.some(m => m.team === team._id);
+    if (!hasMsgs) {
+      messages.push({
+        _id: 'msg_welcome_' + Date.now(),
+        team: team._id,
+        sender: sender || currentUser,
+        content: `Hey ${currentUser.name.split(' ')[0]}! Collaboration request accepted. Let's build our hackathon project together! 🚀`,
+        text: `Hey ${currentUser.name.split(' ')[0]}! Collaboration request accepted. Let's build our hackathon project together! 🚀`,
+        createdAt: new Date().toISOString()
+      });
+      demoStore.set('messages', messages);
+    }
+
+    return { 
+      data: { 
+        success: true, 
+        message: 'Collaboration request accepted! Team chat unlocked.', 
+        data: targetReq || { _id: reqId, status: 'accepted' }, 
+        team 
+      } 
+    };
+  }
+
+  // 10b. PUT /collaboration/requests/:id/reject
+  if (cleanUrl.includes('/reject') && method === 'put') {
+    const match = cleanUrl.match(/\/requests\/([^/]+)\/reject/);
+    const reqId = match ? match[1] : null;
+    const rawReqs = demoStore.get('requests', []);
+    const reqList = Array.isArray(rawReqs) ? rawReqs : [...(rawReqs.sent || []), ...(rawReqs.received || [])];
+    const targetReq = reqId ? reqList.find(r => r._id === reqId) : null;
+    if (targetReq) {
+      targetReq.status = 'rejected';
+      demoStore.set('requests', reqList);
+    }
+    return { data: { success: true, message: 'Request declined', data: targetReq } };
   }
 
   // 11. GET /teams/my
   if (cleanUrl === '/teams/my' || cleanUrl === '/teams/my/') {
     const currentUser = demoStore.get('currentUser') || demoStore.get('users')[0];
-    const teams = demoStore.get('teams');
-    const team = teams.find(t => t._id === currentUser.teamId) || (currentUser.role === 'participant' ? teams[0] : null);
+    const teams = demoStore.get('teams', []);
+    let team = teams.find(t => 
+      (currentUser.teamId && t._id === currentUser.teamId) ||
+      t.members?.some(m => String(m.user?._id || m.user) === String(currentUser._id))
+    );
+    if (!team && currentUser.role === 'participant') {
+      team = teams[0] || null;
+    }
+    return { data: { success: true, data: team, team } };
+  }
+
+  // 11b. GET /teams/:id
+  if (cleanUrl.startsWith('/teams/')) {
+    const teamId = cleanUrl.replace(/^\/teams\/?/, '').trim();
+    const teams = demoStore.get('teams', []);
+    const team = teams.find(t => t._id === teamId) || teams[0] || null;
     return { data: { success: true, data: team, team } };
   }
 
@@ -200,21 +341,34 @@ export async function handleDemoRequest(config) {
 
   // 14. GET/POST /messages
   if (cleanUrl.startsWith('/messages')) {
+    const rawId = cleanUrl.replace(/^\/messages\/?/, '').trim();
+    const targetTeamId = rawId || (data && data.teamId) || 'team_nexus';
     const messages = demoStore.get('messages', []);
+
     if (method === 'post') {
       const currentUser = demoStore.get('currentUser') || demoStore.get('users')[0];
       const newMsg = {
         _id: 'msg_' + Date.now(),
-        team: data.teamId || 'team_nexus',
-        sender: currentUser,
-        text: data.content || data.text || 'Message',
+        team: targetTeamId,
+        sender: {
+          _id: currentUser._id,
+          name: currentUser.name,
+          email: currentUser.email,
+          avatar: currentUser.avatar
+        },
+        content: data.content || data.text || '',
+        text: data.content || data.text || '',
         createdAt: new Date().toISOString()
       };
       messages.push(newMsg);
       demoStore.set('messages', messages);
       return { data: { success: true, data: newMsg } };
     }
-    return { data: { success: true, count: messages.length, data: messages } };
+
+    const teamMessages = rawId 
+      ? messages.filter(m => m.team === rawId)
+      : messages;
+    return { data: { success: true, count: teamMessages.length, data: teamMessages } };
   }
 
   // 15. GET/PUT /notifications

@@ -39,17 +39,31 @@ const CollaborationPage = () => {
     setBusyId(id);
     try {
       const res = await api.put(`/collaboration/requests/${id}/accept`);
-      const createdTeam = res.data?.team || res.data?.data?.team || null;
+      let createdTeam = res.data?.team || res.data?.data?.team || null;
+      if (!createdTeam) {
+        try {
+          const myTeamRes = await api.get('/teams/my');
+          createdTeam = myTeamRes.data?.data || myTeamRes.data?.team || null;
+        } catch {}
+      }
+
       setTeam(createdTeam);
       if (createdTeam?._id) {
         useAuthStore.getState().updateUser({ teamId: createdTeam._id });
       }
+
       // Only pending requests keep Accept/Reject; accepted/rejected drop to history.
       setRequests(prev => ({
         ...prev,
         received: prev.received.map(r => r._id === id ? { ...r, status: 'accepted' } : r),
       }));
-      toast.success(`Team formed: ${createdTeam?.name || 'your team'} is ready! 🚀`);
+
+      toast.success(`Request accepted! Opening Team Chat... 🚀`);
+
+      // Immediately redirect User B to the Chat page
+      setTimeout(() => {
+        navigate('/chat', { state: { teamId: createdTeam?._id, team: createdTeam, autoOpened: true } });
+      }, 350);
     } catch (err) {
       console.error('Failed to accept request:', err);
       toast.error(err.response?.data?.message || 'Failed to accept request');

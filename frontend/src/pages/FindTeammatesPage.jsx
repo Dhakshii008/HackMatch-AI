@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import GlassCard from '../components/ui/GlassCard';
 import NeonButton from '../components/ui/NeonButton';
 import TeamChatPanel from '../components/chat/TeamChatPanel';
@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 
 const FindTeammatesPage = () => {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const myId = user?._id;
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -137,7 +138,7 @@ const FindTeammatesPage = () => {
       const senderId = acceptedReq?.sender?._id;
       setIncoming(prev => prev.filter((r) => r._id !== id));
       // Prefer the team the accept response returns; fall back to a refetch.
-      let team = res.data?.team || null;
+      let team = res.data?.team || res.data?.data?.team || null;
       if (!team) {
         try {
           const teamRes = await api.get('/teams/my');
@@ -152,9 +153,12 @@ const FindTeammatesPage = () => {
         setSentRequests(prev => new Set(prev).add(String(senderId)));
         setMatches(prev => prev.map(m => String(m.user?._id) === String(senderId) ? { ...m, status: 'ALREADY_TEAMMATE' } : m));
       }
-      // The shared chatbox opens the moment the team exists.
-      setChatOpen(true);
-      toast.success(`Team formed: ${res.data?.team?.name || team?.name || 'your team'} is ready! Chat is now open.`);
+      toast.success(`Team formed: ${res.data?.team?.name || team?.name || 'your team'} is ready! Opening Team Chat... 🚀`);
+      
+      // Immediately redirect User B to the Chat page
+      setTimeout(() => {
+        navigate('/chat', { state: { teamId: team?._id, team, autoOpened: true } });
+      }, 350);
     } catch (err) {
       console.error('Failed to accept request:', err);
       toast.error(err.response?.data?.message || 'Failed to accept request');

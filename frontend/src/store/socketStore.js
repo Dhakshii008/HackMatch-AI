@@ -9,18 +9,47 @@ const getSocketUrl = () => {
 
 const isStaticHost = typeof window !== 'undefined' && !import.meta.env.VITE_API_URL && window.location.hostname.includes('github.io');
 
-// Lightweight in-memory socket emulator for static demo hosting
+// Lightweight cross-tab socket emulator for static demo hosting
 const createMockSocket = () => {
   const handlers = {};
+  let channel = null;
+  try {
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      channel = new BroadcastChannel('hackmatch_mock_socket');
+      channel.onmessage = (event) => {
+        const { evt, data } = event.data || {};
+        if (evt && handlers[evt]) {
+          handlers[evt].forEach(cb => cb(data));
+        }
+      };
+    }
+  } catch (e) {
+    console.warn('BroadcastChannel error:', e);
+  }
+
   return {
     on: (evt, cb) => {
       handlers[evt] = handlers[evt] || [];
       handlers[evt].push(cb);
     },
+    off: (evt, cb) => {
+      if (handlers[evt]) {
+        handlers[evt] = handlers[evt].filter(fn => fn !== cb);
+      }
+    },
     emit: (evt, data) => {
       if (handlers[evt]) handlers[evt].forEach(cb => cb(data));
+      if (channel) {
+        try {
+          channel.postMessage({ evt, data });
+        } catch {}
+      }
     },
-    disconnect: () => {}
+    disconnect: () => {
+      if (channel) {
+        try { channel.close(); } catch {}
+      }
+    }
   };
 };
 

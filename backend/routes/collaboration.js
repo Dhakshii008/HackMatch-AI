@@ -395,6 +395,18 @@ router.put('/requests/:id/accept', protect, async (req, res) => {
       team = roster;
     }
 
+    // Ensure an initial welcoming team message exists
+    const Message = require('../models/Message');
+    const existingMsg = await Message.findOne({ team: team._id });
+    if (!existingMsg) {
+      await Message.create({
+        team: team._id,
+        sender: request.sender._id,
+        content: `Hey ${request.receiver.name.split(' ')[0]}! Collaboration request accepted. Let's build our hackathon project together! 🚀`,
+        type: 'text'
+      });
+    }
+
     const io = req.app.get('io');
     if (io) {
       io.to('user_' + request.sender._id).emit('collaboration_accepted', {

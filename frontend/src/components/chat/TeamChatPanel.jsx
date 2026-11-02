@@ -220,7 +220,10 @@ const TeamChatPanel = ({
   if (!teamId) return null;
 
   const members = team.members || [];
-  const otherMembers = members.filter((m) => String(m.user?._id) !== String(meId));
+  const otherMembers = members.filter((m) => {
+    const uid = typeof m.user === 'object' && m.user ? m.user._id : (m.user || m._id);
+    return String(uid) !== String(meId);
+  });
 
   return (
     <GlassCard className={`flex flex-col overflow-hidden ${className}`}>
@@ -248,16 +251,19 @@ const TeamChatPanel = ({
       {/* Both avatars, connected — emphasises the two-way chat */}
       <div className="px-4 py-2.5 border-b border-white/5 bg-black/20 flex items-center gap-3 flex-wrap">
         {members.map((m, i) => {
-          const isMe = String(m.user?._id) === String(meId);
+          const memberUser = typeof m.user === 'object' && m.user !== null 
+            ? m.user 
+            : (typeof m === 'object' && m.name ? m : { _id: m.user || m, name: 'Team Member' });
+          const isMe = String(memberUser._id) === String(meId);
           return (
-            <React.Fragment key={m.user?._id || i}>
+            <React.Fragment key={memberUser._id || i}>
               {i > 0 && <span className="text-gray-600 text-xs">↔</span>}
               <div className="flex items-center gap-2">
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${isMe ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white' : 'bg-gradient-to-br from-purple-600 to-pink-600 text-white'}`}>
-                  {(m.user?.name || '?')[0]}
+                  {(memberUser.name || '?')[0].toUpperCase()}
                 </div>
                 <span className="text-xs text-gray-300">
-                  {isMe ? 'You' : m.user?.name}
+                  {isMe ? 'You' : memberUser.name}
                 </span>
               </div>
             </React.Fragment>
